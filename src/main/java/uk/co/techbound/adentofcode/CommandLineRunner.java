@@ -38,7 +38,7 @@ public class CommandLineRunner implements org.springframework.boot.CommandLineRu
         if(problemSolvers.containsKey(problemName)) {
             log.info("Solving problem: {}", problemName);
             long timeTaken = TimerUtils.timeIt(() -> problemSolvers.get(problemName).solve(problemArguments));
-            log.info("Time taken to solve: {}ns", timeTaken);
+            log.info("Time taken to solve: {}ms", timeTaken);
         } else {
             log.error("Unknown problem: {}", problemName);
         }
