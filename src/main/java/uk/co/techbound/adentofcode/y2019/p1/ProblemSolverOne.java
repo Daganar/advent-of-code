@@ -9,7 +9,6 @@ import uk.co.techbound.adentofcode.ProblemSolver;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.List;
 
 @Component
 @Log4j2
@@ -18,7 +17,7 @@ public class ProblemSolverOne implements ProblemSolver {
     private static final ProblemName PROBLEM_NAME = new ProblemName(2019, 1);
 
     @Override
-    public void solve(List<String> problemArguments) {
+    public void solve() {
         try {
             long totalFuel = StreamEx.ofLines(new ClassPathResource("problems/1/input.txt").getFile().toPath())
                 .mapToLong(Long::parseLong)

@@ -11,23 +11,28 @@ import java.util.List;
 
 @Log4j2
 @Component
-public class Problem1 extends AbstractProblemSolver {
+public class Problem1 extends AbstractProblemSolver<List<Integer>> {
 
-    private void solveCombinations(List<Integer> values, int length) {
-        CombinationUtils.allCombinationsOfIntegers(values, length)
-            .filter(combinations -> ArrayMathUtils.sum(combinations) == 2020)
-            .forEach(combinations -> log.info("Values: {}, Product: {}", combinations, ArrayMathUtils.multiply(combinations)));
+    private long solveCombinations(List<Integer> values, int length) {
+        int[] solution = CombinationUtils.allCombinationsOfIntegers(values, length)
+                .findAny(combinations -> ArrayMathUtils.sum(combinations) == 2020)
+                .orElseThrow();
+        log.debug("Values: {}", solution);
+        return ArrayMathUtils.multiply(solution);
     }
 
     @Override
-    public void solve(List<String> problemArguments) {
-        StreamEx<String> lines = getLinesOfProblemInput();
-        List<Integer> values = lines.map(Integer::valueOf).toList();
+    protected Object partOne(List<Integer> lines) {
+        return solveCombinations(lines, 2);
+    }
 
-        log.info("Solving part one");
-        solveCombinations(values, 2);
+    @Override
+    protected Object partTwo(List<Integer> lines) {
+        return solveCombinations(lines, 3);
+    }
 
-        log.info("Solving part two");
-        solveCombinations(values, 3);
+    @Override
+    protected List<Integer> convertInput(StreamEx<String> lines) {
+        return lines.map(Integer::valueOf).toList();
     }
 }

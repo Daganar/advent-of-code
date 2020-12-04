@@ -10,7 +10,6 @@ import uk.co.techbound.adentofcode.ProblemSolver;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.List;
 
 @Component
 @Log4j2
@@ -22,7 +21,7 @@ public class ProblemSolverTwo implements ProblemSolver {
     private final OpcodeFunctions opcodeFunctions;
 
     @Override
-    public void solve(List<String> problemArguments) {
+    public void solve() {
         int[] inputArray = getInputData();
         setInitialState(inputArray, 12, 2);
         runProgram(inputArray);

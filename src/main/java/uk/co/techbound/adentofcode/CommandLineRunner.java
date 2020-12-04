@@ -22,14 +22,11 @@ public class CommandLineRunner implements org.springframework.boot.CommandLineRu
     public void run(String... args) {
         List<String> arguments = Arrays.asList(args);
 
-        List<String> problemArguments;
         ProblemName problemName;
         if(arguments.isEmpty()) {
-            problemArguments = arguments;
             problemName = getTodaysProblemName();
         } else if(arguments.size() >= 2) {
             problemName = getProblemNameFromArguments(arguments);
-            problemArguments = arguments.subList(2, arguments.size());
         } else {
             log.error("Unknown arguments: {}", arguments);
             return;
@@ -37,7 +34,7 @@ public class CommandLineRunner implements org.springframework.boot.CommandLineRu
 
         if(problemSolvers.containsKey(problemName)) {
             log.info("Solving problem: {}", problemName);
-            long timeTaken = TimerUtils.timeIt(() -> problemSolvers.get(problemName).solve(problemArguments));
+            long timeTaken = TimerUtils.timeIt(() -> problemSolvers.get(problemName).solve());
             log.info("Time taken to solve: {}ms", timeTaken);
         } else {
             log.error("Unknown problem: {}", problemName);
@@ -45,12 +42,10 @@ public class CommandLineRunner implements org.springframework.boot.CommandLineRu
     }
 
     private ProblemName getProblemNameFromArguments(List<String> arguments) {
-        ProblemName problemName;
         Iterator<String> iterator = arguments.iterator();
         int year = Integer.parseInt(iterator.next());
         int day = Integer.parseInt(iterator.next());
-        problemName = new ProblemName(year, day);
-        return problemName;
+        return new ProblemName(year, day);
     }
 
     private ProblemName getTodaysProblemName() {

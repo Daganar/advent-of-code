@@ -1,5 +1,6 @@
 package uk.co.techbound.adentofcode;
 
+import lombok.extern.log4j.Log4j2;
 import one.util.streamex.StreamEx;
 import org.springframework.core.io.ClassPathResource;
 
@@ -7,7 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 
-public abstract class AbstractProblemSolver implements ProblemSolver {
+@Log4j2
+public abstract class AbstractProblemSolver<T> implements ProblemSolver {
 
     protected StreamEx<String> getLinesOfProblemInput() {
         String path = getRelativePackageOfCurrentProblem().replace('.', '/') + "/input.txt";
@@ -22,6 +24,15 @@ public abstract class AbstractProblemSolver implements ProblemSolver {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    @Override
+    public void solve() {
+        T partOneInput = convertInput(getLinesOfProblemInput());
+        log.info("Part 1: {}", partOne(partOneInput));
+
+        T partTwoInput = convertInput(getLinesOfProblemInput());
+        log.info("Part 1: {}", partTwo(partTwoInput));
     }
 
     @Override
@@ -46,4 +57,8 @@ public abstract class AbstractProblemSolver implements ProblemSolver {
         return string.substring(1);
     }
 
+    protected abstract Object partOne(T input);
+    protected abstract Object partTwo(T input);
+
+    protected abstract T convertInput(StreamEx<String> lines);
 }

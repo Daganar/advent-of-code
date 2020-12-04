@@ -8,16 +8,15 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 import uk.co.techbound.adentofcode.AbstractProblemSolver;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 @Log4j2
 @Component
-public class Problem4 extends AbstractProblemSolver {
+public class Problem4 extends AbstractProblemSolver<StreamEx<Map<String,String>>> {
 
-    Map<String, Predicate<String>> fieldValidators = Map.of(
+    private final Map<String, Predicate<String>> fieldValidators = Map.of(
         "byr", validateNumberPredicate(byr -> byr >= 1920 && byr <= 2002),
         "iyr", validateNumberPredicate(iyr -> iyr >= 2010 && iyr <= 2020),
         "eyr", validateNumberPredicate(eyr -> eyr >= 2020 && eyr <= 2030),
@@ -28,21 +27,25 @@ public class Problem4 extends AbstractProblemSolver {
     );
 
     @Override
-    public void solve(List<String> problemArguments) {
+    protected Object partOne(StreamEx<Map<String, String>> input) {
+        return input.filter(this::isValidPassport1).count();
+    }
 
-        StreamEx<String> lines = getLinesOfProblemInput();
-        List<Map<String, String>> passports = lines.groupRuns((first, second) -> !second.trim().isEmpty())
-                .map(list ->
-                        StreamEx.of(list)
-                                .remove(String::isEmpty)
-                                .flatMap(line -> StreamEx.of(line.split(" ")))
-                                .map(fieldValue -> fieldValue.split(":"))
-                                .toMap(keyValue -> keyValue[0], keyValue -> keyValue[1])
-                )
-                .filter(this::isValidPassport3)
-                .toList();
-        log.info("{}", passports);
-        log.info("size: {}", passports.size());
+    @Override
+    protected Object partTwo(StreamEx<Map<String, String>> input) {
+        return input.filter(this::isValidPassport3).count();
+    }
+
+    @Override
+    protected StreamEx<Map<String, String>> convertInput(StreamEx<String> lines) {
+        return lines.groupRuns((first, second) -> !second.trim().isEmpty())
+            .map(list ->
+                StreamEx.of(list)
+                    .remove(String::isEmpty)
+                    .flatMap(line -> StreamEx.of(line.split(" ")))
+                    .map(fieldValue -> fieldValue.split(":"))
+                    .toMap(keyValue -> keyValue[0], keyValue -> keyValue[1])
+            );
     }
 
     private boolean isValidPassport1(Map<String,String> map) {
