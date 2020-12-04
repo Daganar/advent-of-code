@@ -9,18 +9,30 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 @Log4j2
-public abstract class AbstractProblemSolver<T> implements ProblemSolver {
-
-    protected StreamEx<String> getLinesOfProblemInput() {
-        String path = getRelativePackageOfCurrentProblem().replace('.', '/') + "/input.txt";
-        return getLinesOfProblemInput(path);
-    }
+public abstract class AbstractProblemSolver<T,U> implements ProblemSolver {
 
     protected StreamEx<String> getLinesOfProblemInput(String filename) {
+        String path = makeCurrentProblemPath(filename);
+        File fileFromClasspath = getFileFromClasspath(path);
+        return getLinesOfProblemInput(fileFromClasspath);
+    }
+
+    private String makeCurrentProblemPath(String filename) {
+        return getRelativePackageOfCurrentProblem().replace('.', '/') + "/" + filename;
+    }
+
+    protected StreamEx<String> getLinesOfProblemInput(File file) {
         try {
-            ClassPathResource classPathResource = new ClassPathResource(filename);
-            File input = classPathResource.getFile();
-            return StreamEx.ofLines(input.toPath());
+            return StreamEx.ofLines(file.toPath());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private File getFileFromClasspath(String path) {
+        ClassPathResource classPathResource = new ClassPathResource(path);
+        try {
+            return classPathResource.getFile();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -28,11 +40,19 @@ public abstract class AbstractProblemSolver<T> implements ProblemSolver {
 
     @Override
     public void solve() {
-        T partOneInput = convertInput(getLinesOfProblemInput());
+        if(exampleExists()) {
+            log.info("Example solution to part 1: {}", partOneExample());
+            log.info("Example solution to part 2: {}", partTwoExample());
+        }
+        T partOneInput = convertInput(getLinesOfProblemInput("input.txt"));
         log.info("Part 1: {}", partOne(partOneInput));
 
-        T partTwoInput = convertInput(getLinesOfProblemInput());
+        T partTwoInput = convertInput(getLinesOfProblemInput("input.txt"));
         log.info("Part 1: {}", partTwo(partTwoInput));
+    }
+
+    private boolean exampleExists() {
+        return new ClassPathResource(makeCurrentProblemPath("example.txt")).exists();
     }
 
     @Override
@@ -57,8 +77,18 @@ public abstract class AbstractProblemSolver<T> implements ProblemSolver {
         return string.substring(1);
     }
 
-    protected abstract Object partOne(T input);
-    protected abstract Object partTwo(T input);
+    protected U partOneExample() {
+        T exampleInput = convertInput(getLinesOfProblemInput("example.txt"));
+        return partOne(exampleInput);
+    }
+
+    protected U partTwoExample() {
+        T exampleInput = convertInput(getLinesOfProblemInput("example.txt"));
+        return partTwo(exampleInput);
+    }
+
+    protected abstract U partOne(T input);
+    protected abstract U partTwo(T input);
 
     protected abstract T convertInput(StreamEx<String> lines);
 }

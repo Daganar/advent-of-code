@@ -4,7 +4,6 @@ import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import one.util.streamex.EntryStream;
 import one.util.streamex.StreamEx;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.stereotype.Component;
 import uk.co.techbound.adentofcode.AbstractProblemSolver;
 
@@ -12,14 +11,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static uk.co.techbound.adentofcode.utils.ValidationUtils.validateIntegerPredicate;
+
 @Log4j2
 @Component
-public class Problem4 extends AbstractProblemSolver<StreamEx<Map<String,String>>> {
+public class Problem4 extends AbstractProblemSolver<StreamEx<Map<String,String>>, Long> {
 
     private final Map<String, Predicate<String>> fieldValidators = Map.of(
-        "byr", validateNumberPredicate(byr -> byr >= 1920 && byr <= 2002),
-        "iyr", validateNumberPredicate(iyr -> iyr >= 2010 && iyr <= 2020),
-        "eyr", validateNumberPredicate(eyr -> eyr >= 2020 && eyr <= 2030),
+        "byr", validateIntegerPredicate(byr -> byr >= 1920 && byr <= 2002),
+        "iyr", validateIntegerPredicate(iyr -> iyr >= 2010 && iyr <= 2020),
+        "eyr", validateIntegerPredicate(eyr -> eyr >= 2020 && eyr <= 2030),
         "hgt", this::validateHeight,
         "hcl", hairColour -> hairColour.matches("#[0-9a-f]{6}"),
         "ecl", eyeColour -> eyeColour.matches("(amb|blu|brn|gry|grn|hzl|oth)"),
@@ -27,12 +28,12 @@ public class Problem4 extends AbstractProblemSolver<StreamEx<Map<String,String>>
     );
 
     @Override
-    protected Object partOne(StreamEx<Map<String, String>> input) {
+    protected Long partOne(StreamEx<Map<String, String>> input) {
         return input.filter(this::isValidPassport1).count();
     }
 
     @Override
-    protected Object partTwo(StreamEx<Map<String, String>> input) {
+    protected Long partTwo(StreamEx<Map<String, String>> input) {
         return input.filter(this::isValidPassport3).count();
     }
 
@@ -70,14 +71,6 @@ public class Problem4 extends AbstractProblemSolver<StreamEx<Map<String,String>>
                         return value >= 59 && value <= 76;
                     }
                 })
-                .isPresent();
-    }
-
-    private Predicate<String> validateNumberPredicate(Predicate<Integer> isValid) {
-        return field -> Optional.of(field)
-                .filter(NumberUtils::isDigits)
-                .map(Integer::valueOf)
-                .filter(isValid)
                 .isPresent();
     }
 

@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 @Log4j2
 @Component
-public class Problem2 extends AbstractProblemSolver<StreamEx<List<String>>> {
+public class Problem2 extends AbstractProblemSolver<StreamEx<List<String>>, Long> {
 
     private final ClassPathResource classPathResource = new ClassPathResource("2a.txt");
     private final Pattern pattern = Pattern.compile("(\\d+)-(\\d+) (.): (.*)");
@@ -30,12 +30,16 @@ public class Problem2 extends AbstractProblemSolver<StreamEx<List<String>>> {
     }
 
     @Override
-    protected Object partOne(StreamEx<List<String>> input) {
-        return null;
+    protected Long partOne(StreamEx<List<String>> input) {
+        return input
+            .mapToEntry(list -> new MinMaxCharacterRule(Integer.parseInt(list.get(0)) - 1, Integer.parseInt(list.get(1)) - 1, list.get(2).charAt(0)), list -> list.get(3))
+            .filterKeyValue(MinMaxCharacterRule::meetsCriteria)
+            .values()
+            .count();
     }
 
     @Override
-    protected Object partTwo(StreamEx<List<String>> input) {
+    protected Long partTwo(StreamEx<List<String>> input) {
         return input
                 .mapToEntry(list -> new CharacterExistsInPositionRule(Integer.parseInt(list.get(0)) - 1, Integer.parseInt(list.get(1)) - 1, list.get(2).charAt(0)), list -> list.get(3))
                 .filterKeyValue(CharacterExistsInPositionRule::meetsCriteria)

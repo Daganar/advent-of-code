@@ -11,7 +11,7 @@ import java.util.List;
 
 @Log4j2
 @Component
-public class Problem1 extends AbstractProblemSolver<List<Integer>> {
+public class Problem1 extends AbstractProblemSolver<List<Integer>, Long> {
 
     private long solveCombinations(List<Integer> values, int length) {
         int[] solution = CombinationUtils.allCombinationsOfIntegers(values, length)
@@ -22,12 +22,12 @@ public class Problem1 extends AbstractProblemSolver<List<Integer>> {
     }
 
     @Override
-    protected Object partOne(List<Integer> lines) {
+    protected Long partOne(List<Integer> lines) {
         return solveCombinations(lines, 2);
     }
 
     @Override
-    protected Object partTwo(List<Integer> lines) {
+    protected Long partTwo(List<Integer> lines) {
         return solveCombinations(lines, 3);
     }
 

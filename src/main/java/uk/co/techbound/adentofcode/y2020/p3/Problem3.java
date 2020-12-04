@@ -9,9 +9,9 @@ import java.util.List;
 
 @Log4j2
 @Component
-public class Problem3 extends AbstractProblemSolver<List<String>> {
+public class Problem3 extends AbstractProblemSolver<List<String>, Long> {
 
-    private int countTreesOnSlope(List<String> map, int xIncrement, int yIncrement) {
+    private long countTreesOnSlope(List<String> map, int xIncrement, int yIncrement) {
         log.debug("Counting trees for slope: Right {}, Down {}", xIncrement, yIncrement);
         int initialWidth = map.iterator().next().length();
         int x = 0;
@@ -32,12 +32,12 @@ public class Problem3 extends AbstractProblemSolver<List<String>> {
     }
 
     @Override
-    protected Object partOne(List<String> input) {
+    protected Long partOne(List<String> input) {
         return countTreesOnSlope(input, 3, 1);
     }
 
     @Override
-    protected Object partTwo(List<String> map) {
+    protected Long partTwo(List<String> map) {
         long a = countTreesOnSlope(map, 1, 1);
         long b = countTreesOnSlope(map, 3, 1);
         long c = countTreesOnSlope(map, 5, 1);
