@@ -48,7 +48,7 @@ public abstract class AbstractProblemSolver<T,U> implements ProblemSolver {
         log.info("Part 1: {}", partOne(partOneInput));
 
         T partTwoInput = convertInput(getLinesOfProblemInput("input.txt"));
-        log.info("Part 1: {}", partTwo(partTwoInput));
+        log.info("Part 2: {}", partTwo(partTwoInput));
     }
 
     private boolean exampleExists() {
