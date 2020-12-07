@@ -20,24 +20,20 @@ public class Problem7 extends AbstractProblemSolver<Map<String, List<Map<String,
             .mapValues(list -> StreamEx.of(list).flatCollection(Map::keySet).toList())
             .toMap();
         return StreamEx.of(bagRules.keySet())
-            .map(colour -> getContainingColours(colour, bagRules))
-            .filter(set -> set.contains("shiny gold"))
+            .filter(colour -> containsColour("shiny gold", colour, bagRules))
             .count();
     }
 
-    public Set<String> getContainingColours(String startingColour, Map<String, List<String>> bagRules) {
-        Set<String> colours = new HashSet<>();
-        colours.addAll(bagRules.get(startingColour));
-        boolean changed = false;
-        do {
-            HashSet<String> newColours = new HashSet<>();
-            for(String colour : colours) {
-                List<String> c = bagRules.get(colour);
-                newColours.addAll(c);
+    public boolean containsColour(String toFind, String startingColour, Map<String, List<String>> bagRules) {
+        List<String> currentBagContents = bagRules.get(startingColour);
+        for(String subBagColour : currentBagContents) {
+            if(toFind.equals(subBagColour)) {
+                return true;
+            } else if (containsColour(toFind, subBagColour, bagRules)) {
+                return true;
             }
-            changed = colours.addAll(newColours);
-        } while (changed);
-        return colours;
+        }
+        return false;
     }
 
     @Override
@@ -58,34 +54,30 @@ public class Problem7 extends AbstractProblemSolver<Map<String, List<Map<String,
 
     @Override
     protected Map<String, List<Map<String, Integer>>> convertInput(StreamEx<String> lines) {
+        Pattern pattern = Pattern.compile("((\\d+) (.*)|(no other)) bags?");
         return lines.map(line -> line.split(" bags contain "))
             .mapToEntry(split -> split[0], split -> split[1])
             .mapValues(Problem7::removeLastCharacter)
             .mapValues(rules -> rules.split(", "))
-            .mapValues(rules -> {
-                Pattern pattern = Pattern.compile("((\\d+) (.*)|(no other)) bags?");
-
-                List<Map<String, Integer>> bagColourCounts = StreamEx.of(rules)
-                    .map(rule -> {
-                        Map<String, Integer> ruleMap;
-                        Matcher matcher = pattern.matcher(rule);
-                        if (matcher.matches()) {
-                            String colour = matcher.group(3);
-                            if ("no other".equals(matcher.group(4))) {
-                                ruleMap = Collections.emptyMap();
-                            } else {
-                                int count = Integer.parseInt(matcher.group(2));
-                                ruleMap = Map.of(colour, count);
-                            }
-                            return ruleMap;
+            .mapValues(rules -> StreamEx.of(rules)
+                .map(rule -> {
+                    Map<String, Integer> ruleMap;
+                    Matcher matcher = pattern.matcher(rule);
+                    if (matcher.matches()) {
+                        String colour = matcher.group(3);
+                        if ("no other".equals(matcher.group(4))) {
+                            ruleMap = Collections.emptyMap();
                         } else {
-                            throw new RuntimeException("Unknown rule!: " + rule);
+                            int count = Integer.parseInt(matcher.group(2));
+                            ruleMap = Map.of(colour, count);
                         }
-                    })
-                    .remove(Map::isEmpty)
-                    .toList();
-                return bagColourCounts;
-            })
+                        return ruleMap;
+                    } else {
+                        throw new RuntimeException("Unknown rule!: " + rule);
+                    }
+                })
+                .remove(Map::isEmpty)
+                .toList())
             .toMap();
     }
 
