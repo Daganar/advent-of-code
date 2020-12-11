@@ -20,14 +20,17 @@ public class Problem9 extends AbstractProblemSolver<List<Long>, Long> {
         int preamblestart = 0;
         int preambleEnd = 0;
         do {
-        preambleEnd = preamblestart + preambleSize;
-        List<Long> preamble = input.subList(preamblestart, preambleEnd);
+            preambleEnd = preamblestart + preambleSize;
+            if(preambleEnd >= input.size()) {
+                break;
+            }
+            List<Long> preamble = input.subList(preamblestart, preambleEnd);
             Long currentValue = input.get(preambleEnd);
             if(!canMakeFromPreamble(preamble, currentValue)) {
                 return currentValue;
             }
             preamblestart++;
-        } while(preambleEnd < input.size());
+        } while(true);
 
         return null;
     }
