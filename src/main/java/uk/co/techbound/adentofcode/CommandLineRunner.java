@@ -25,7 +25,7 @@ public class CommandLineRunner implements org.springframework.boot.CommandLineRu
         ProblemName problemName;
         if(arguments.isEmpty()) {
             problemName = getTodaysProblemName();
-        } else if(arguments.size() >= 2) {
+        } else if(arguments.size() == 2) {
             problemName = getProblemNameFromArguments(arguments);
         } else {
             log.error("Unknown arguments: {}", arguments);

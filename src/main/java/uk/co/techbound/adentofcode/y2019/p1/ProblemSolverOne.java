@@ -19,7 +19,7 @@ public class ProblemSolverOne implements ProblemSolver {
     @Override
     public void solve() {
         try {
-            long totalFuel = StreamEx.ofLines(new ClassPathResource("problems/1/input.txt").getFile().toPath())
+            long totalFuel = StreamEx.ofLines(new ClassPathResource("y2019/p1/input.txt").getFile().toPath())
                 .mapToLong(Long::parseLong)
                 .map(this::calculateFuelOfModuleAndFuel)
                 .sum();

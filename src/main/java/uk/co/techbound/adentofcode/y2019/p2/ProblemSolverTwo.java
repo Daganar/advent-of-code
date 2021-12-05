@@ -2,47 +2,27 @@ package uk.co.techbound.adentofcode.y2019.p2;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import one.util.streamex.IntStreamEx;
 import one.util.streamex.StreamEx;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import uk.co.techbound.adentofcode.AbstractProblemSolver;
 import uk.co.techbound.adentofcode.ProblemName;
-import uk.co.techbound.adentofcode.ProblemSolver;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.util.Arrays;
+import java.util.function.Function;
 
 @Component
 @Log4j2
 @AllArgsConstructor
-public class ProblemSolverTwo implements ProblemSolver {
+public class ProblemSolverTwo extends AbstractProblemSolver<int[], Integer> {
 
     private static final ProblemName PROBLEM_NAME = new ProblemName(2019, 2);
 
     private final OpcodeFunctions opcodeFunctions;
 
-    @Override
-    public void solve() {
-        int[] inputArray = getInputData();
-        setInitialState(inputArray, 12, 2);
-        runProgram(inputArray);
-
-        log.info("Output: {}", inputArray);
-    }
-
     public void setInitialState(int[] inputArray, int noun, int verb) {
         inputArray[1] = noun;
         inputArray[2] = verb;
-    }
-
-    public int[] getInputData() {
-        try {
-            return StreamEx.ofLines(new ClassPathResource("problems/2/input.txt").getFile().toPath())
-                .flatArray(line -> line.split(","))
-                .mapToInt(Integer::parseInt)
-                .toArray();
-        } catch (IOException ioe) {
-            throw new UncheckedIOException(ioe);
-        }
     }
 
     void runProgram(int[] inputArray) {
@@ -51,16 +31,42 @@ public class ProblemSolverTwo implements ProblemSolver {
         }
     }
 
-    public void performOperation(int i, int[] inputArray) {
-        int operation = inputArray[i];
-        int operandA = inputArray[inputArray[i + 1]];
-        int operandB = inputArray[inputArray[i + 2]];
-        int outputIndex = inputArray[i + 3];
-        inputArray[outputIndex] = operation == 1 ? operandA + operandB : operandA * operandB;
-    }
-
     @Override
     public ProblemName getProblemName() {
         return PROBLEM_NAME;
+    }
+
+    @Override
+    protected Integer partOne(int[] input) {
+        setInitialState(input, 12, 2);
+        runProgram(input);
+
+        log.info("Output: {}", input);
+        return input[0];
+    }
+
+    @Override
+    protected Integer partTwo(int[] input) {
+        return
+            IntStreamEx.range(100)
+            .boxed()
+            .flatMapToEntry(i -> IntStreamEx.range(i, 100).boxed().mapToEntry(Function.identity(), k -> i).toMap())
+            .invert()
+            .filterKeyValue((noun, verb) -> {
+                int[] inputData = Arrays.copyOf(input, input.length);
+                setInitialState(inputData, noun, verb);
+                runProgram(inputData);
+                return inputData[0] == 19690720;
+            })
+            .mapKeyValue((noun, verb) -> noun * 100 + verb)
+            .findAny()
+            .orElseThrow();
+    }
+
+    @Override
+    protected int[] convertInput(StreamEx<String> lines) {
+        return lines.flatArray(line -> line.split(","))
+            .mapToInt(Integer::parseInt)
+            .toArray();
     }
 }
